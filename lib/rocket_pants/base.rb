@@ -15,11 +15,9 @@ module RocketPants
     end
 
     MODULES = [
-      ActionController::HideActions,
       ActionController::UrlFor,
       ActionController::Redirecting,
       ActionController::ConditionalGet,
-      ActionController::RackDelegation,
       record_identifier_klass,
       ActionController::HttpAuthentication::Basic::ControllerMethods,
       ActionController::HttpAuthentication::Digest::ControllerMethods,
@@ -73,7 +71,8 @@ module RocketPants
     config_accessor :protected_instance_variables
     self.protected_instance_variables = %w(@assigns @performed_redirect @performed_render
       @variables_added @request_origin @url @parent_controller @action_name
-      @before_filter_chain_aborted @_headers @_params @_response)
+      @before_filter_chain_aborted @before_action_chain_aborted
+      @_headers @_params @_response)
 
     ActiveSupport.run_load_hooks(:rocket_pants, self)
 
