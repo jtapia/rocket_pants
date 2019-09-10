@@ -23,7 +23,7 @@ describe RocketPants::Linking do
     let(:pagination)   { WillPaginate::Collection.create(current_page, 10) { |p| p.replace %w(a b c d e f g h i j); p.total_entries = 200 } }
 
     before :each do
-      stub(controller_class).test_data { pagination }
+      allow(controller_class).to receive(:test_data) { pagination }
       # Test Item...
       controller_class.send(:define_method, :page_url) do |page|
         "page#{page}"
@@ -34,24 +34,24 @@ describe RocketPants::Linking do
       @current_page = 1
       get :test_data
       links = response.headers['Link']
-      links.size.should == 3
-      links.map { |i| i[/rel=\"(.*)\"/, 1] }.should =~ %w(next last first)
-      links.map { |i| i[/<(.*)>/, 1] }.should =~ %w(page1 page2 page20)
+      expect(links.size).to eq 3
+      expect(links.map { |i| i[/rel=\"(.*)\"/, 1] }).to match_array %w(next last first)
+      expect(links.map { |i| i[/<(.*)>/, 1] }).to match_array %w(page1 page2 page20)
     end
 
     it 'should not include links without a pagination url method' do
       controller_class.send(:define_method, :page_url) { |item| nil }
       get :test_data
-      response.headers['Link'].should be_blank
+      expect(response.headers['Link']).to be_blank
     end
 
     it 'should generate all links where possible' do
       @current_page = 2
       get :test_data
       links = response.headers['Link']
-      links.size.should == 4
-      links.map { |i| i[/rel=\"(.*)\"/, 1] }.should =~ %w(next last first prev)
-      links.map { |i| i[/<(.*)>/, 1] }.should =~ %w(page1 page1 page3 page20)
+      expect(links.size).to eq 4
+      expect(links.map { |i| i[/rel=\"(.*)\"/, 1] }).to match_array %w(next last first prev)
+      expect(links.map { |i| i[/<(.*)>/, 1] }).to match_array %w(page1 page1 page3 page20)
     end
 
   end
@@ -61,19 +61,19 @@ describe RocketPants::Linking do
     it 'should let you add a link tag' do
       link_portion { link :search, "http://google.com/" }
       links = response.headers['Link']
-      links.should be_present
-      links.size.should == 1
-      links.first.strip.should == "<http://google.com/>; rel=\"search\""
+      expect(links).to be_present
+      expect(links.size).to eq 1
+      expect(links.first.strip).to eq "<http://google.com/>; rel=\"search\""
     end
 
     it 'should allow extra attributes' do
       link_portion { link :search, "http://google.com/", :awesome => "Sure Am" }
       links = response.headers['Link']
-      links.should be_present
-      links.size.should == 1
+      expect(links).to be_present
+      expect(links.size).to eq 1
       parts = links.first.strip.split(";").map(&:strip)
       link = parts.shift
-      parts.should =~ ["awesome=\"Sure Am\"", "rel=\"search\""]
+      expect(parts).to match_array ["awesome=\"Sure Am\"", "rel=\"search\""]
     end
 
   end
@@ -83,9 +83,9 @@ describe RocketPants::Linking do
     it 'should provide a shorthand to generate multiple links' do
       link_portion { links :next => "http://example.com/page/3", :prev => "http://example.com/page/1" }
       links = response.headers['Link']
-      links.should be_present
-      links.size.should == 2
-      links.should =~ ["<http://example.com/page/3>; rel=\"next\"", "<http://example.com/page/1>; rel=\"prev\""]
+      expect(links).to be_present
+      expect(links.size).to eq 2
+      expect(links).to match_array ["<http://example.com/page/3>; rel=\"next\"", "<http://example.com/page/1>; rel=\"prev\""]
     end
 
     it 'should combine multiple links into a single header' do
@@ -94,9 +94,9 @@ describe RocketPants::Linking do
         link :prev, "http://example.com/page/1"
       end
       links = response.headers['Link']
-      links.should be_present
-      links.size.should == 2
-      links.should =~ ["<http://example.com/page/3>; rel=\"next\"", "<http://example.com/page/1>; rel=\"prev\""]
+      expect(links).to be_present
+      expect(links.size).to eq 2
+      expect(links).to match_array ["<http://example.com/page/3>; rel=\"next\"", "<http://example.com/page/1>; rel=\"prev\""]
     end
 
   end

@@ -37,9 +37,9 @@ describe RocketPants::Routing do
     end
 
     it 'should recognise a path to a single version' do
-      recognize_path('/1/a').should == {:controller => 'test', :action => 'echo', :version => '1', :format => 'json'}
-      recognize_path('/2/b').should == {:controller => 'test', :action => 'echo', :version => '2', :format => 'json'}
-      recognize_path('/3/b').should == {:controller => 'test', :action => 'echo', :version => '3', :format => 'json'}
+      expect(recognize_path('/1/a')).to eq({:controller => 'test', :action => 'echo', :version => '1', :format => 'json'})
+      expect(recognize_path('/2/b')).to eq({:controller => 'test', :action => 'echo', :version => '2', :format => 'json'})
+      expect(recognize_path('/3/b')).to eq({:controller => 'test', :action => 'echo', :version => '3', :format => 'json'})
     end
 
     it 'should not recognise a path to other versions' do
@@ -67,20 +67,20 @@ describe RocketPants::Routing do
     end
 
     it 'should recognise a path with and without prefix when allow_prefix is given' do
-      recognize_path('/v1/a').should == {:controller => 'test', :action => 'echo', :version => 'v1', :format => 'json', :rp_prefix => {:text => "v", :required => false}}
-      recognize_path('/1/a').should == {:controller => 'test', :action => 'echo', :version => '1', :format => 'json', :rp_prefix => {:text => "v", :required => false}}
+      expect(recognize_path('/v1/a')).to eq({:controller => 'test', :action => 'echo', :version => 'v1', :format => 'json', :rp_prefix => {:text => "v", :required => false}})
+      expect(recognize_path('/1/a')).to eq({:controller => 'test', :action => 'echo', :version => '1', :format => 'json', :rp_prefix => {:text => "v", :required => false}})
     end
 
     it 'should not recognise a path when prefix is given' do
       expect { recognize_path('/v2/b') }.to raise_error(ActionController::RoutingError)
       expect { recognize_path('/v3/b') }.to raise_error(ActionController::RoutingError)
-      recognize_path('/2/b').should == {:controller => 'test', :action => 'echo', :version => '2', :format => 'json'}
-      recognize_path('/3/b').should == {:controller => 'test', :action => 'echo', :version => '3', :format => 'json'}
+      expect(recognize_path('/2/b')).to eq({:controller => 'test', :action => 'echo', :version => '2', :format => 'json'})
+      expect(recognize_path('/3/b')).to eq({:controller => 'test', :action => 'echo', :version => '3', :format => 'json'})
     end
 
     it 'should recognise a path only with version when require_prefix is given' do
-      recognize_path('/v4/c').should == {:controller => 'test', :action => 'echo', :version => 'v4', :format => 'json', :rp_prefix => {:text => "v", :required => true}}
-      recognize_path('/v5/c').should == {:controller => 'test', :action => 'echo', :version => 'v5', :format => 'json', :rp_prefix => {:text => "v", :required => true}}
+      expect(recognize_path('/v4/c')).to eq({:controller => 'test', :action => 'echo', :version => 'v4', :format => 'json', :rp_prefix => {:text => "v", :required => true}})
+      expect(recognize_path('/v5/c')).to eq({:controller => 'test', :action => 'echo', :version => 'v5', :format => 'json', :rp_prefix => {:text => "v", :required => true}})
       expect { recognize_path('/4/c') }.to raise_error(ActionController::RoutingError)
       expect { recognize_path('/5/c') }.to raise_error(ActionController::RoutingError)
     end

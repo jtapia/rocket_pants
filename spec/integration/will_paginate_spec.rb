@@ -17,29 +17,29 @@ describe RocketPants::Base, 'will_paginate integration', :integration => true, :
     end
 
     it 'should let you expose a classically paginated collection' do
-      mock(TestController).test_data { User.paginate :per_page => 5, :page => 1 }
+      allow(TestController).to receive(:test_data) { User.paginate :per_page => 5, :page => 1 }
       get :test_data
-      content[:response].should be_present
-      content[:count].should == 5
-      content[:pagination].should be_present
-      content[:pagination][:count].should == 25
+      expect(content[:response]).to be_present
+      expect(content[:count]).to eq(5)
+      expect(content[:pagination]).to be_present
+      expect(content[:pagination][:count]).to eq(25)
     end
 
     it 'should not expose non-paginated as paginated' do
-      mock(TestController).test_data { User.all }
+      allow(TestController).to receive(:test_data) { User.all }
       get :test_data
-      content[:response].should be_present
-      content[:count].should == 25
-      content[:pagination].should_not be_present
+      expect(content[:response]).to be_present
+      expect(content[:count]).to eq(25)
+      expect(content[:pagination]).to_not be_present
     end
 
     it 'should let you expose a relational collection' do
-      mock(TestController).test_data { User.page(1).limit(5).all }
+      allow(TestController).to receive(:test_data) { User.page(1).limit(5).all }
       get :test_data
-      content[:response].should be_present
-      content[:count].should == 5
-      content[:pagination].should be_present
-      content[:pagination][:count].should == 25
+      expect(content[:response]).to be_present
+      expect(content[:count]).to eq(5)
+      expect(content[:pagination]).to be_present
+      expect(content[:pagination][:count]).to eq(25)
     end
 
   end
@@ -48,21 +48,21 @@ describe RocketPants::Base, 'will_paginate integration', :integration => true, :
 
     it 'should correctly convert a will paginate collection' do
       pager = WillPaginate::Collection.create(2, 10) { |p| p.replace %w(a b c d e f g h i j); p.total_entries = 200 }
-      mock(TestController).test_data { pager }
+      allow(TestController).to receive(:test_data) { pager }
       get :test_data
-      content.should have_key(:pagination)
-      content[:pagination].should == {
+      expect(content).to have_key(:pagination)
+      expect(content[:pagination]).to eq({
         :next => 3,
         :current => 2,
         :previous => 1,
         :pages => 20,
         :count => 200,
         :per_page => 10
-      }.stringify_keys
-      content.should have_key(:count)
-      content[:count].should == 10
+      }.stringify_keys)
+      expect(content).to have_key(:count)
+      expect(content[:count]).to eq(10)
     end
-    
+
   end
 
 end
